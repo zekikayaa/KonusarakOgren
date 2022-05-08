@@ -1,13 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations.Schema;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.ComponentModel.DataAnnotations.Schema;
 
 namespace TestApp.Domains.Domains
 {
-    internal class Question : BaseEntity
+    public class Question : BaseEntity
     {
 
         public string Inquiry { get; set; }

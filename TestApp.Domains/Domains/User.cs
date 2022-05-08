@@ -1,12 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace TestApp.Domains.Domains
+﻿namespace TestApp.Domains.Domains
 {
-    internal class User : BaseEntity
+    public class User : BaseEntity
     {
         public string FirstName { get; set; }
 

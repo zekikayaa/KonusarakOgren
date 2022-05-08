@@ -1,6 +1,6 @@
 ﻿namespace TestApp.Domains.Domains
 {
-    internal class Post : BaseEntity
+    public class Post : BaseEntity
     {
         public string Title { get; set; }
 
