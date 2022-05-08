@@ -1,6 +1,8 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Linq.Expressions;
 using TestApp.DAL.Repositories.Abstract;
 using TestApp.Domains.Domains;
 
@@ -53,6 +55,19 @@ namespace TestApp.DAL.Repositories.Concrete
         public TEntity GetById(int id)
         {
             throw new NotImplementedException();
+        }
+
+        public IQueryable<TEntity> Query(Expression<Func<TEntity, bool>> filter = null, Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>> orderBy = null)
+        {
+            IQueryable<TEntity> query = _dbSet;
+
+            if (filter != null)
+                query = query.Where(filter);
+
+            if (orderBy != null)
+                query = orderBy(query);
+
+            return query;
         }
 
         public void Update(TEntity entitiy)

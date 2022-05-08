@@ -4,24 +4,34 @@
     For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 *@
 @{
+
+    var erros = TempData["UserCredentialErros"] as string;
+
 }
 
-<h1>SignIn</h1>
+<h1>Login</h1>
+
+
+@if (!string.IsNullOrEmpty(erros))
+{
+    <h2 class="alert-danger" style="padding:20px">@erros</h2>
+}
+
 
 <form action="/SignIn" method="post"  >
 
     <div class="form-group">
         @Html.LabelFor( Model => Model.UserName)
-        @Html.TextBoxFor(Model  =>  Model.UserName , new { @class = "form-control", placeholder = "Enter your password" } )
-        @Html.ValidationMessageFor(Model => Model.UserName)
+        @Html.TextBoxFor(Model  =>  Model.UserName , new { @class = "form-control", placeholder = "Enter your username" } )
+         <span class="alert-danger">@Html.ValidationMessageFor(Model => Model.UserName)</span>
     </div>
 
     <div class="form-group">
         @Html.LabelFor( Model => Model.Password)
         @Html.TextBoxFor(Model  =>  Model.Password , new { @class = "form-control", placeholder = "Enter your password" ,type="password" } )
-        @Html.ValidationMessageFor(Model => Model.Password)
+         <span class="alert-danger">@Html.ValidationMessageFor(Model => Model.Password)</span>
     </div>
 
-    <button type="submit" class="btn btn-primary">Register</button>
+    <button type="submit" class="btn btn-primary">Login</button>
 
 </form>

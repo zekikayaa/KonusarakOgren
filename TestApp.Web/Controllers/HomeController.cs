@@ -1,6 +1,13 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
+using System.Security.Claims;
+using System.Threading.Tasks;
 using TestApp.DAL.Repositories.Abstract;
 using TestApp.Domains.Domains;
 using TestApp.Domains.ViewModel;
@@ -24,6 +31,9 @@ namespace TestApp.Web.Controllers
             return View();
         }
 
+
+
+        [Authorize]
         public IActionResult Privacy()
         {
             return View();
@@ -31,24 +41,23 @@ namespace TestApp.Web.Controllers
 
 
         [HttpGet("SignUp")]
-        public IActionResult Register(RegisterViewModel registerModel)
+        public IActionResult Register()
         {
-
-
-
-
             return View();
         }
 
 
         [HttpPost("SignUp")]
-        public IActionResult RegisterPost(RegisterViewModel registerModel)
+        public IActionResult Register(RegisterViewModel registerModel)
         {
+
+            if(!ModelState.IsValid)
+                return View();
 
 
             #region BLL_Katmani
 
-            var user = new User()
+            var user = new User()   
             {
                 CreatedDate = System.DateTime.UtcNow,
                 Email = registerModel.Email,
@@ -66,15 +75,70 @@ namespace TestApp.Web.Controllers
 
 
         [HttpGet("SignIn")]
-        public IActionResult Login(LoginViewModel loginModel)
+        public IActionResult Login()
         {
             return View();
         }
 
         [HttpPost("SignIn")]
-        public IActionResult LoginPost(LoginViewModel loginModel)
+        public async Task<IActionResult> Login(LoginViewModel loginModel)
         {
-            return View();
+
+
+            if (!ModelState.IsValid)
+                return View();
+
+
+
+            #region BLL_Katmani
+
+            var user = _userRepository.Query( w=> w.UserName  ==  loginModel.UserName).FirstOrDefault();
+
+            if(user == null) 
+            {
+                TempData["UserCredentialErros"] = "UserName or password is wrong";
+                return View("Login");
+            }
+
+            if(user.Password != loginModel.Password)
+            {
+                TempData["UserCredentialErros"] = "UserName or password is wrong";
+                return View("Login");
+            }
+
+            if (user.Password == loginModel.Password)
+            {
+                // Login
+
+                var claims = new List<Claim>();
+                claims.Add(new Claim("username", user.UserName));
+                claims.Add(new Claim(ClaimTypes.NameIdentifier, user.UserName));
+                claims.Add(new Claim(ClaimTypes.Name, user.FirstName));
+                var clamisIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
+
+                var claimsPrincipal = new ClaimsPrincipal(clamisIdentity);
+
+                await HttpContext.SignInAsync(claimsPrincipal);
+
+                return RedirectToAction("Privacy");
+
+            }
+
+
+
+            #endregion
+
+
+            return RedirectToAction("Index");
+        }
+
+        [Authorize]
+        public async Task<IActionResult> Logout()
+        {
+
+            await HttpContext.SignOutAsync();
+
+            return Redirect("/");
         }
 
 

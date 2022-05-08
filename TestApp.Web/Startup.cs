@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
@@ -34,6 +35,26 @@ namespace TestApp.Web
 
             services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
 
+            services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme).AddCookie(options =>
+            {
+                options.LoginPath = "/SignIn";
+                options.Events = new CookieAuthenticationEvents()
+                {
+                    OnSigningIn = async context =>
+                    {
+                        await Task.CompletedTask;
+                    },
+                    OnSignedIn = async context =>
+                    {
+                        await Task.CompletedTask;
+                    },
+                    OnValidatePrincipal = async context =>
+                    {
+                        await Task.CompletedTask;
+                    }
+                };
+            });
+
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -53,6 +74,9 @@ namespace TestApp.Web
             app.UseStaticFiles();
 
             app.UseRouting();
+
+            app.UseAuthentication(); // zeki
+
 
             app.UseAuthorization();
 

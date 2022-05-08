@@ -10,37 +10,37 @@
 
 <h1>Register Page</h1>
 
-<form action="/SignUp" method="post"  >
+<form action="/SignUp" method="post">
 
 
     <div class="form-group">
         @Html.LabelFor( Model => Model.FirstName)
         @Html.TextBoxFor(Model  =>  Model.FirstName , new { @class = "form-control", placeholder = "Enter your name" } )
-        @Html.ValidationMessageFor(Model => Model.FirstName)
+       <span class="alert-danger"> @Html.ValidationMessageFor(Model => Model.FirstName)</span>
     </div>
 
     <div class="form-group">
         @Html.LabelFor( Model => Model.LastName)
         @Html.TextBoxFor(Model  =>  Model.LastName , new { @class = "form-control", placeholder = "Enter your last name" } )
-        @Html.ValidationMessageFor(Model => Model.LastName)
+       <span class="alert-danger"> @Html.ValidationMessageFor(Model => Model.LastName)</span>
     </div>
 
     <div class="form-group">
         @Html.LabelFor( Model => Model.Email)
         @Html.TextBoxFor(Model  =>  Model.Email , new { @class = "form-control", placeholder = "Enter your emil", type ="email" , } )
-        @Html.ValidationMessageFor(Model => Model.Email)
+        <span class="alert-danger">@Html.ValidationMessageFor(Model => Model.Email )</span>
     </div>
 
     <div class="form-group">
         @Html.LabelFor( Model => Model.UserName)
-        @Html.TextBoxFor(Model  =>  Model.UserName , new { @class = "form-control", placeholder = "Enter your password" } )
-        @Html.ValidationMessageFor(Model => Model.UserName)
+        @Html.TextBoxFor(Model  =>  Model.UserName , new { @class = "form-control", placeholder = "Enter your username" } )
+        <span class="alert-danger">@Html.ValidationMessageFor(Model => Model.UserName)</span>
     </div>
 
     <div class="form-group">
         @Html.LabelFor( Model => Model.Passowrd)
         @Html.TextBoxFor(Model  =>  Model.Passowrd , new { @class = "form-control", placeholder = "Enter your password" ,type="password" } )
-        @Html.ValidationMessageFor(Model => Model.Passowrd)
+        <span class="alert-danger">@Html.ValidationMessageFor(Model => Model.Passowrd)</span>
     </div>
 
     <button type="submit" class="btn btn-primary">Register</button>

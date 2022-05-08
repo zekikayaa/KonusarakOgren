@@ -1,4 +1,7 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Linq.Expressions;
 using TestApp.Domains.Domains;
 
 namespace TestApp.DAL.Repositories.Abstract
@@ -6,6 +9,8 @@ namespace TestApp.DAL.Repositories.Abstract
     public interface IRepository<TEntity> 
     {
         TEntity GetById(int id);
+
+        IQueryable<TEntity> Query(Expression<Func<TEntity, bool>> filter = null, Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>> orderBy = null);
 
         IEnumerable<TEntity> GetAll();
 
