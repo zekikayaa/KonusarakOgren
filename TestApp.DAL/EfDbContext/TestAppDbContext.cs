@@ -23,7 +23,7 @@ namespace TestApp.DAL.EfDbContext
         //}
 
         //Sql connectin appsetings.jsonda belirtip Startup'dan ulasıyoruz
-        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder) => optionsBuilder.UseSqlite("Data Source=DataBase\\TestApp.db");
+        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder) => optionsBuilder.UseSqlite("Data Source=..\\TestApp.Web\\DataBase\\TestApp.db");
 
 
     }

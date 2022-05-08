@@ -1,0 +1,27 @@
+﻿@using TestApp.Domains.ViewModel
+@model LoginViewModel
+@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@{
+}
+
+<h1>SignIn</h1>
+
+<form action="/SignIn" method="post"  >
+
+    <div class="form-group">
+        @Html.LabelFor( Model => Model.UserName)
+        @Html.TextBoxFor(Model  =>  Model.UserName , new { @class = "form-control", placeholder = "Enter your password" } )
+        @Html.ValidationMessageFor(Model => Model.UserName)
+    </div>
+
+    <div class="form-group">
+        @Html.LabelFor( Model => Model.Password)
+        @Html.TextBoxFor(Model  =>  Model.Password , new { @class = "form-control", placeholder = "Enter your password" ,type="password" } )
+        @Html.ValidationMessageFor(Model => Model.Password)
+    </div>
+
+    <button type="submit" class="btn btn-primary">Register</button>
+
+</form>
