@@ -22,13 +22,14 @@ namespace TestApp.DAL.Repositories.Concrete
 
         public void Add(TEntity entity)
         {
-            _dbSet.AddRange(entity);
+            _dbSet.Add(entity);
             _dbContext.SaveChanges();
         }
 
         public void AddRaange(IEnumerable<TEntity> entities)
         {
-            throw new NotImplementedException();
+            _dbSet.AddRange(entities);
+            _dbContext.SaveChanges();
         }
 
         public void Delete(int id)
@@ -49,7 +50,7 @@ namespace TestApp.DAL.Repositories.Concrete
 
         public IEnumerable<TEntity> GetAll()
         {
-            throw new NotImplementedException();
+            return _dbSet.ToList();
         }
 
         public TEntity GetById(int id)

@@ -1,8 +1,36 @@
-﻿@{
+﻿@using TestApp.Domains.Domains
+@model List<Post>
+
+@{
     ViewData["Title"] = "Home Page";
+      var counter = 1;
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://docs.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
-</div>
+
+
+<h2>Create test by using last news</h2>
+
+<table class="table table-bordered">
+    <thead>
+        <tr>
+            <th scope="col">#</th>
+            <th scope="col">Title</th>
+            <th scope="col">Create Test</th>
+
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var post in Model)
+        {
+            <tr>
+                <th scope="row">@counter</th>
+                <td>@post.Title</td>
+                <td>   <a class="btn btn-primary" href="/CreateTest?postId=@post.Id" >Create Test</a> </td>
+                @*<td>   <a class="btn btn-primary" asp-controller="Home" asp-action="CreateTest" asp-route-postId="@post.Id">Create Test</a> </td>*@
+            </tr>
+
+            counter++;
+        }
+
+    </tbody>
+</table>

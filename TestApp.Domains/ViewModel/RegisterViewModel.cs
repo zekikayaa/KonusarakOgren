@@ -23,6 +23,5 @@ namespace TestApp.Domains.ViewModel
         [Required]
         public string Passowrd { get; set; }
 
-
     }
 }

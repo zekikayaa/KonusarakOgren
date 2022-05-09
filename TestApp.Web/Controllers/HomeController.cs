@@ -3,10 +3,14 @@ using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Net.Http;
 using System.Security.Claims;
+using System.Text.Json;
 using System.Threading.Tasks;
 using TestApp.DAL.Repositories.Abstract;
 using TestApp.Domains.Domains;
@@ -19,26 +23,106 @@ namespace TestApp.Web.Controllers
         private readonly ILogger<HomeController> _logger;
 
         private readonly IRepository<User> _userRepository;
+        private readonly IRepository<Test> _testRepository;
+        private readonly IRepository<Question> _questionRepository;
+        private readonly IRepository<Post> _postRepository;
 
-        public HomeController(ILogger<HomeController> logger, IRepository<User> userRepository)
+        public HomeController(ILogger<HomeController> logger, IRepository<User> userRepository, IRepository<Test> testRepository, IRepository<Question> questionRepository, IRepository<Post> postRepository)
         {
+          
             _logger = logger;
             _userRepository = userRepository;
+            _testRepository = testRepository;
+            _questionRepository = questionRepository;
+            _postRepository = postRepository;
         }
 
+        [Authorize]
         public IActionResult Index()
         {
-            return View();
+            var lastPosts = _postRepository.GetAll();
+
+            return View(lastPosts);
         }
 
 
 
         [Authorize]
-        public IActionResult Privacy()
+        [HttpGet("CreateTest")]
+        public IActionResult CreateTest(int postId)
         {
-            return View();
+
+            #region BLL_Katmani
+
+            var selectedPost = _postRepository.Query(w => w.Id == postId).First();
+
+
+            var postViewModel = new TestViewModel()
+            {
+                PostId = selectedPost.Id,
+                PostContent = selectedPost.Content,
+                PostTitle = selectedPost.Title,
+            };
+
+
+            #endregion
+
+
+            return View(postViewModel);
         }
 
+
+
+        [Authorize]
+        [HttpPost("CreateTest")]
+        public IActionResult CreateTest(TestViewModel testViewModel)
+        {
+            if (!ModelState.IsValid)
+                return View(testViewModel);
+
+            #region BLL_Katmani
+            {
+
+
+                // create and  insert test
+                var test = new Test()
+                {
+                    PostId = 11,
+                    CreatedDate = DateTime.UtcNow,
+
+                };
+
+                _testRepository.Add(test);
+
+                //create and insert test questions
+                var questionEntities = new List<Question>();
+
+                foreach (var questionModel in testViewModel.Questions)
+                {
+                    var question = new Question()
+                    {
+                        TestId = test.Id,
+                        CreatedDate = DateTime.UtcNow,
+                        Inquiry = questionModel.Inquiry,
+                        CorrectOption = questionModel.CorrectOption,
+                        OptionA = questionModel.OptionA,
+                        OptionB = questionModel.OptionB,
+                        OptionC = questionModel.OptionC,
+                        OptionD = questionModel.OptionD,
+                    };
+
+                    questionEntities.Add(question);
+
+                }
+
+                _questionRepository.AddRaange(questionEntities);
+
+            }
+            #endregion
+
+
+            return RedirectToAction("Index");
+        }
 
         [HttpGet("SignUp")]
         public IActionResult Register()
@@ -51,26 +135,26 @@ namespace TestApp.Web.Controllers
         public IActionResult Register(RegisterViewModel registerModel)
         {
 
-            if(!ModelState.IsValid)
+            if (!ModelState.IsValid)
                 return View();
 
 
             #region BLL_Katmani
 
-            var user = new User()   
+            var user = new User()
             {
                 CreatedDate = System.DateTime.UtcNow,
                 Email = registerModel.Email,
                 FirstName = registerModel.FirstName,
                 LastName = registerModel.LastName,
-                UserName = registerModel.LastName,
+                UserName = registerModel.UserName,
                 Password = registerModel.Passowrd
             };
 
             _userRepository.Add(user);
             #endregion
 
-            return RedirectToAction("Index") ;
+            return RedirectToAction("Index");
         }
 
 
@@ -88,44 +172,42 @@ namespace TestApp.Web.Controllers
             if (!ModelState.IsValid)
                 return View();
 
-
-
             #region BLL_Katmani
-
-            var user = _userRepository.Query( w=> w.UserName  ==  loginModel.UserName).FirstOrDefault();
-
-            if(user == null) 
             {
-                TempData["UserCredentialErros"] = "UserName or password is wrong";
-                return View("Login");
+
+                var user = _userRepository.Query(w => w.UserName == loginModel.UserName).FirstOrDefault();
+
+                if (user == null)
+                {
+                    TempData["UserCredentialErros"] = "UserName or password is wrong";
+                    return View("Login");
+                }
+
+                if (user.Password != loginModel.Password)
+                {
+                    TempData["UserCredentialErros"] = "UserName or password is wrong";
+                    return View("Login");
+                }
+
+                if (user.Password == loginModel.Password)
+                {
+                    // Login
+
+                    var claims = new List<Claim>();
+                    claims.Add(new Claim("username", user.UserName));
+                    claims.Add(new Claim(ClaimTypes.NameIdentifier, user.UserName));
+                    claims.Add(new Claim(ClaimTypes.Name, user.FirstName));
+                    var clamisIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
+
+                    var claimsPrincipal = new ClaimsPrincipal(clamisIdentity);
+
+                    await HttpContext.SignInAsync(claimsPrincipal);
+
+                    return RedirectToAction("Index");
+
+                }
+
             }
-
-            if(user.Password != loginModel.Password)
-            {
-                TempData["UserCredentialErros"] = "UserName or password is wrong";
-                return View("Login");
-            }
-
-            if (user.Password == loginModel.Password)
-            {
-                // Login
-
-                var claims = new List<Claim>();
-                claims.Add(new Claim("username", user.UserName));
-                claims.Add(new Claim(ClaimTypes.NameIdentifier, user.UserName));
-                claims.Add(new Claim(ClaimTypes.Name, user.FirstName));
-                var clamisIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
-
-                var claimsPrincipal = new ClaimsPrincipal(clamisIdentity);
-
-                await HttpContext.SignInAsync(claimsPrincipal);
-
-                return RedirectToAction("Privacy");
-
-            }
-
-
-
             #endregion
 
 
@@ -140,7 +222,6 @@ namespace TestApp.Web.Controllers
 
             return Redirect("/");
         }
-
 
     }
 }

@@ -1,0 +1,80 @@
+﻿@using TestApp.Domains.ViewModel
+@model TestViewModel
+
+@{
+
+    var counter = 1;
+}
+
+
+
+
+
+<h2>@Model.PostTitle</h2>
+
+<p>@Model.PostContent</p>
+
+
+<form method="post" action="/CreateTest">
+
+    @for (var i = 0; i < 4; i++)
+    {
+        <div class="form-group mt-5">
+            @*<input type="text" class="form-control" placeholder="Question">*@
+            @Html.TextBoxFor(m => m.Questions[i].Inquiry , new {type="text", @class="form-control", placeholder="Question"})
+            <span class="alert-danger"> @Html.ValidationMessageFor(m => m.Questions[i].Inquiry)</span>
+        </div>
+
+        <div class="form-row">
+            <div class="form-group col-md-6">
+                @*<input class="form-control" placeholder="A)">*@
+                @Html.TextBoxFor(m => m.Questions[i].OptionA , new {type="text", @class="form-control", placeholder="A)"})
+                <span class="alert-danger"> @Html.ValidationMessageFor(m => m.Questions[i].OptionA)</span>
+
+
+            </div>
+            <div class="form-group col-md-6">
+                @*<input class="form-control" placeholder="B)">*@
+                @Html.TextBoxFor(m => m.Questions[i].OptionB , new {type="text", @class="form-control", placeholder="B)"})
+                <span class="alert-danger"> @Html.ValidationMessageFor(m => m.Questions[i].OptionB)</span>
+
+
+            </div>
+        </div>
+
+        <div class="form-row">
+            <div class="form-group col-md-6">
+                @*<input type="email" class="form-control" id="inputEmail4" placeholder="C)">*@
+                @Html.TextBoxFor(m => m.Questions[i].OptionC , new {type="text", @class="form-control", placeholder="C)"})
+                <span class="alert-danger"> @Html.ValidationMessageFor(m => m.Questions[i].OptionC)</span>
+
+
+            </div>
+            <div class="form-group col-md-6">
+                @*<input class="form-control" placeholder="D)">*@
+                @Html.TextBoxFor(m => m.Questions[i].OptionD , new {type="text", @class="form-control", placeholder="D)"})
+                <span class="alert-danger"> @Html.ValidationMessageFor(m => m.Questions[i].OptionD)</span>
+
+
+            </div>
+            <div class="form-group col-md-2 offset-5">
+                <select name="Questions[@i].CorrectOption" class="form-control">
+                    <option selected value=@null>Choose answer</option>
+                    <option value="A">A</option>
+                    <option value="B">B</option>
+                    <option value="C">C</option>
+                    <option value="D">D</option>
+                </select>
+                <span class="alert-danger"> @Html.ValidationMessageFor(m => m.Questions[i].CorrectOption)</span>
+
+            </div>
+        </div>
+
+    }
+    <button type="submit" class="btn btn-primary col-md-4 offset-4 mt-3">Create Test</button>
+
+    <input type="hidden" value="@Model.PostId" name="PostId" id="PostId" />
+    <input type="hidden" value="@Model.PostTitle" name="PostTitle" id="PostTitle" />
+    <input type="hidden" value="@Model.PostContent" name="PostContent" id="PostContent" />
+
+</form>
