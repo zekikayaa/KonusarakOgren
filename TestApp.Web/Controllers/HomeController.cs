@@ -3,14 +3,10 @@ using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
-using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
-using System.Net.Http;
 using System.Security.Claims;
-using System.Text.Json;
 using System.Threading.Tasks;
 using TestApp.DAL.Repositories.Abstract;
 using TestApp.Domains.Domains;
@@ -29,7 +25,7 @@ namespace TestApp.Web.Controllers
 
         public HomeController(ILogger<HomeController> logger, IRepository<User> userRepository, IRepository<Test> testRepository, IRepository<Question> questionRepository, IRepository<Post> postRepository)
         {
-          
+
             _logger = logger;
             _userRepository = userRepository;
             _testRepository = testRepository;
@@ -43,118 +39,6 @@ namespace TestApp.Web.Controllers
             var lastPosts = _postRepository.GetAll();
 
             return View(lastPosts);
-        }
-
-
-
-        [Authorize]
-        [HttpGet("CreateTest")]
-        public IActionResult CreateTest(int postId)
-        {
-
-            #region BLL_Katmani
-
-            var selectedPost = _postRepository.Query(w => w.Id == postId).First();
-
-
-            var postViewModel = new TestViewModel()
-            {
-                PostId = selectedPost.Id,
-                PostContent = selectedPost.Content,
-                PostTitle = selectedPost.Title,
-            };
-
-
-            #endregion
-
-
-            return View(postViewModel);
-        }
-
-
-
-        [Authorize]
-        [HttpPost("CreateTest")]
-        public IActionResult CreateTest(TestViewModel testViewModel)
-        {
-            if (!ModelState.IsValid)
-                return View(testViewModel);
-
-            #region BLL_Katmani
-            {
-
-
-                // create and  insert test
-                var test = new Test()
-                {
-                    PostId = 11,
-                    CreatedDate = DateTime.UtcNow,
-
-                };
-
-                _testRepository.Add(test);
-
-                //create and insert test questions
-                var questionEntities = new List<Question>();
-
-                foreach (var questionModel in testViewModel.Questions)
-                {
-                    var question = new Question()
-                    {
-                        TestId = test.Id,
-                        CreatedDate = DateTime.UtcNow,
-                        Inquiry = questionModel.Inquiry,
-                        CorrectOption = questionModel.CorrectOption,
-                        OptionA = questionModel.OptionA,
-                        OptionB = questionModel.OptionB,
-                        OptionC = questionModel.OptionC,
-                        OptionD = questionModel.OptionD,
-                    };
-
-                    questionEntities.Add(question);
-
-                }
-
-                _questionRepository.AddRaange(questionEntities);
-
-            }
-            #endregion
-
-
-            return RedirectToAction("Index");
-        }
-
-        [HttpGet("SignUp")]
-        public IActionResult Register()
-        {
-            return View();
-        }
-
-
-        [HttpPost("SignUp")]
-        public IActionResult Register(RegisterViewModel registerModel)
-        {
-
-            if (!ModelState.IsValid)
-                return View();
-
-
-            #region BLL_Katmani
-
-            var user = new User()
-            {
-                CreatedDate = System.DateTime.UtcNow,
-                Email = registerModel.Email,
-                FirstName = registerModel.FirstName,
-                LastName = registerModel.LastName,
-                UserName = registerModel.UserName,
-                Password = registerModel.Passowrd
-            };
-
-            _userRepository.Add(user);
-            #endregion
-
-            return RedirectToAction("Index");
         }
 
 
@@ -221,6 +105,213 @@ namespace TestApp.Web.Controllers
             await HttpContext.SignOutAsync();
 
             return Redirect("/");
+        }
+
+
+
+        [HttpGet("SignUp")]
+        public IActionResult Register()
+        {
+            return View();
+        }
+
+
+        [HttpPost("SignUp")]
+        public IActionResult Register(RegisterViewModel registerModel)
+        {
+
+            if (!ModelState.IsValid)
+                return View();
+
+
+            #region BLL_Katmani
+
+            var user = new User()
+            {
+                CreatedDate = System.DateTime.UtcNow,
+                Email = registerModel.Email,
+                FirstName = registerModel.FirstName,
+                LastName = registerModel.LastName,
+                UserName = registerModel.UserName,
+                Password = registerModel.Passowrd
+            };
+
+            _userRepository.Add(user);
+            #endregion
+
+            return RedirectToAction("Index");
+        }
+
+
+        [Authorize]
+        [HttpGet("CreateTest")]
+        public IActionResult CreateTest(int postId)
+        {
+
+            #region BLL_Katmani
+
+            var selectedPost = _postRepository.Query(w => w.Id == postId).First();
+
+
+            var postViewModel = new TestViewModel()
+            {
+                PostId = selectedPost.Id,
+                PostContent = selectedPost.Content,
+                PostTitle = selectedPost.Title,
+            };
+
+
+            #endregion
+
+
+            return View(postViewModel);
+        }
+
+
+        [Authorize]
+        [HttpPost("CreateTest")]
+        public IActionResult CreateTest(TestViewModel testViewModel)
+        {
+            if (!ModelState.IsValid)
+                return View(testViewModel);
+
+            #region BLL_Katmani
+            {
+
+
+                // create and  insert test
+                var test = new Test()
+                {
+                    PostId = 11,
+                    CreatedDate = DateTime.UtcNow,
+
+                };
+
+                _testRepository.Add(test);
+
+                //create and insert test questions
+                var questionEntities = new List<Question>();
+
+                foreach (var questionModel in testViewModel.Questions)
+                {
+                    var question = new Question()
+                    {
+                        TestId = test.Id,
+                        CreatedDate = DateTime.UtcNow,
+                        Inquiry = questionModel.Inquiry,
+                        CorrectOption = questionModel.CorrectOption,
+                        OptionA = questionModel.OptionA,
+                        OptionB = questionModel.OptionB,
+                        OptionC = questionModel.OptionC,
+                        OptionD = questionModel.OptionD,
+                    };
+
+                    questionEntities.Add(question);
+
+                }
+
+                _questionRepository.AddRaange(questionEntities);
+
+            }
+            #endregion
+
+
+            return RedirectToAction("Index");
+        }
+
+
+        //[Authorize]
+        [HttpGet("Tests")]
+        public IActionResult ExistingTests()
+        {
+            var testViewModelList = new List<TestViewModel>();
+
+            #region BLL_Katmani
+            {
+                //Get all created tests
+
+
+                var existinTests = _testRepository.GetAllWithIncluding("Post", "Questions");
+
+                foreach (var test in existinTests)
+                {
+
+                    var testViewModel = PrepareTestViewModel(test);
+
+                    testViewModelList.Add(testViewModel);
+                }
+
+            }
+            #endregion
+
+
+            return View(testViewModelList);
+        }
+
+
+        //[Authorize]
+        [HttpGet("StartTest")]
+        public IActionResult StartTest(int testId)
+        {
+            var testViewModel = new TestViewModel();
+
+            #region BLL_Katmani
+            {
+
+
+                var willStartTest = _testRepository.QueryWithInclude(test => test.Id == testId, null, "Post", "Questions").FirstOrDefault();
+
+
+                testViewModel = PrepareTestViewModel(willStartTest);
+            }
+            #endregion
+
+
+            return View(testViewModel);
+        }
+
+        private TestViewModel PrepareTestViewModel(Test testEntity)
+        {
+
+            var testViewModel = new TestViewModel()
+            {
+                Id = testEntity.Id,
+                PostContent = testEntity.Post.Content,
+                PostId = testEntity.PostId,
+                PostTitle = testEntity.Post.Title,
+                Questions = PrepareQuestionsViewModel(testEntity.Questions),
+                CreatedDate = testEntity.CreatedDate
+
+            };
+
+            return testViewModel;
+        }
+
+        private List<QuestionTestViewModel> PrepareQuestionsViewModel(ICollection<Question> questionsEntities)
+        {
+
+            var testQuestions = new List<QuestionTestViewModel>();
+
+
+            foreach (var question in questionsEntities)
+            {
+
+                var testQuestion = new QuestionTestViewModel()
+                {
+                    Id= question.Id,
+                    CorrectOption = question.CorrectOption,
+                    Inquiry = question.Inquiry,
+                    OptionA = $"A) {question.OptionA}" ,
+                    OptionB = $"B) {question.OptionB}",
+                    OptionC = $"C) {question.OptionC}",
+                    OptionD = $"D) {question.OptionD}",
+                };
+
+                testQuestions.Add(testQuestion);
+
+            }
+
+            return testQuestions;
         }
 
     }

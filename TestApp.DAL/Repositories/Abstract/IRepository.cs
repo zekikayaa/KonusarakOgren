@@ -12,7 +12,11 @@ namespace TestApp.DAL.Repositories.Abstract
 
         IQueryable<TEntity> Query(Expression<Func<TEntity, bool>> filter = null, Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>> orderBy = null);
 
+        IQueryable<TEntity> QueryWithInclude(Expression<Func<TEntity, bool>> filter = null, Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>> orderBy = null, params string[] includes);
+
         IEnumerable<TEntity> GetAll();
+
+        IEnumerable<TEntity> GetAllWithIncluding(params string[] includes);
 
         void Add(TEntity entity);
 

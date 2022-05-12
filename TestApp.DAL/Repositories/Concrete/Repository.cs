@@ -7,6 +7,7 @@ using TestApp.DAL.Repositories.Abstract;
 using TestApp.Domains.Domains;
 
 
+
 namespace TestApp.DAL.Repositories.Concrete
 {
     public class Repository<TEntity> : IRepository<TEntity> where TEntity : BaseEntity
@@ -53,6 +54,19 @@ namespace TestApp.DAL.Repositories.Concrete
             return _dbSet.ToList();
         }
 
+        public IEnumerable<TEntity> GetAllWithIncluding( params string[] includes)
+        {
+
+            var query = _dbSet.AsQueryable();
+            foreach (var include in includes)
+                query = query.Include(include);
+
+            return query.ToList();
+
+
+            //return _dbSet.Include("Post").Include("Questions");
+        }
+
         public TEntity GetById(int id)
         {
             throw new NotImplementedException();
@@ -67,6 +81,23 @@ namespace TestApp.DAL.Repositories.Concrete
 
             if (orderBy != null)
                 query = orderBy(query);
+
+            return query;
+        }
+
+        public IQueryable<TEntity> QueryWithInclude(Expression<Func<TEntity, bool>> filter = null, Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>> orderBy = null , params string[] includes)
+        {
+            IQueryable<TEntity> query = _dbSet.AsQueryable();
+
+            if (filter != null)
+                query = query.Where(filter);
+
+            if (orderBy != null)
+                query = orderBy(query);
+
+           
+            foreach (var include in includes)
+                query = query.Include(include);
 
             return query;
         }

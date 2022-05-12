@@ -4,6 +4,8 @@ namespace TestApp.Domains.ViewModel
 {
     public class QuestionTestViewModel
     {
+        public int Id { get; set; }
+
         [Required]
         public string Inquiry { get; set; }
 

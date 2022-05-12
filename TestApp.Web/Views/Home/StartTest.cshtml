@@ -1,0 +1,150 @@
+﻿@using TestApp.Domains.ViewModel
+@model TestViewModel
+@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@{
+}
+
+
+<h2>@Model.PostTitle</h2>
+
+<p class="myClass">@Model.PostContent</p>
+
+
+<form method="post" action="/CreateTest">
+
+    @for (var i = 0; i < 4; i++)
+    {
+
+        <div class="form-row ">
+
+            <div class="form-group col-md-6 question" data-questionID="@Model.Questions[i].Id" name="yok">
+                <div class="form-group mt-3">
+                    <p name="Inquiry" id="Inquiry">@(i+1)) @Model.Questions[i].Inquiry</p>
+                    <span class="alert-danger"> @Html.ValidationMessageFor(m => m.Questions[i].Inquiry)</span>
+                </div>
+
+                <div class="form-group col-md-12  mt-0 pt-0 mb-1 pb-0">
+                    <input class="form-control option" name="OptionA" id="OptionA" readonly value="@Model.Questions[i].OptionA">
+                    <span class="alert-danger"> @Html.ValidationMessageFor(m => m.Questions[i].OptionA)</span>
+                </div>
+
+                <div class="form-group col-md-12  mt-0 pt-0 mb-1 pb-0 ">
+                    <input class="form-control option" name="OptionB" id="OptionB" readonly value="@Model.Questions[i].OptionB">
+                    <span class="alert-danger"> @Html.ValidationMessageFor(m => m.Questions[i].OptionB)</span>
+                </div>
+
+                <div class="form-group col-md-12  mt-0 pt-0 mb-1 pb-0">
+                    <input class="form-control option" name="OptionC" id="OptionC" readonly value="@Model.Questions[i].OptionC">
+                    <span class="alert-danger"> @Html.ValidationMessageFor(m => m.Questions[i].OptionC)</span>
+                </div>
+
+                <div class="form-group col-md-12 mt-0 pt-0 mb-1 pb-0">
+                    <input class="form-control option" name="OptionD" id="OptionD" readonly value="@Model.Questions[i].OptionD">
+                    <span class="alert-danger"> @Html.ValidationMessageFor(m => m.Questions[i].OptionD)</span>
+                </div>
+
+
+            </div>
+
+            @{
+                ++i;
+            }
+
+            <div class="form-group col-md-6 question" data-questionID="@Model.Questions[i].Id" name="deneme">
+                <div class="form-group mt-3">
+                    <p name="Inquiry" id="Inquiry">@(i+1)) @Model.Questions[i].Inquiry</p>
+                    <span class="alert-danger"> @Html.ValidationMessageFor(m => m.Questions[i].Inquiry)</span>
+                </div>
+
+                <div class="form-group col-md-12  mt-0 pt-0 mb-1 pb-0">
+                    <input class="form-control option" name="OptionA" id="OptionA" readonly value="@Model.Questions[i].OptionA">
+                    <span class="alert-danger"> @Html.ValidationMessageFor(m => m.Questions[i].OptionA)</span>
+                </div>
+
+                <div class="form-group col-md-12  mt-0 pt-0 mb-1 pb-0 ">
+                    <input class="form-control option" name="OptionB" id="OptionB" readonly value="@Model.Questions[i].OptionB">
+                    <span class="alert-danger"> @Html.ValidationMessageFor(m => m.Questions[i].OptionB)</span>
+                </div>
+
+                <div class="form-group col-md-12  mt-0 pt-0 mb-1 pb-0">
+                    <input class="form-control option" name="OptionC" id="OptionC" readonly value="@Model.Questions[i].OptionC">
+                    <span class="alert-danger"> @Html.ValidationMessageFor(m => m.Questions[i].OptionC)</span>
+                </div>
+
+                <div class="form-group col-md-12 mt-0 pt-0 mb-1 pb-0">
+                    <input class="form-control option" name="OptionD" id="OptionD" readonly value="@Model.Questions[i].OptionD">
+                    <span class="alert-danger"> @Html.ValidationMessageFor(m => m.Questions[i].OptionD)</span>
+                </div>
+
+
+            </div>
+
+
+        </div>
+
+
+
+
+    }
+    <button type="submit" class="btn btn-primary col-md-4 offset-4 mt-3">Create Test</button>
+
+    <input type="hidden" value="@Model.PostId" name="PostId" id="PostId" />
+    <input type="hidden" value="@Model.PostTitle" name="PostTitle" id="PostTitle" />
+    <input type="hidden" value="@Model.PostContent" name="PostContent" id="PostContent" />
+
+</form>
+
+
+@section Scripts{
+<style>
+
+    .form-group {
+        padding-left: 1px;
+        border: 0;
+    }
+
+</style>
+
+<script>
+
+
+    let answeredQuestions = {};
+
+
+        $(document).on("click",".option", function () {
+
+            //console.log(this)
+
+       var questionId = $(this).parent("div").parent("div").attr('data-questionId');
+       var selectedOption =  $(this).attr('Id');
+
+
+
+            let lastSelectedOption  =  answeredQuestions[questionId]
+
+                // herhangi bir sorunun seceneklerinden birini ilkez tklar ise
+              if (typeof lastSelectedOption == 'undefined'){
+
+                  answeredQuestions[questionId] = selectedOption
+                  $(`*[data-questionID="${questionId}"]`).find("#"+selectedOption).css('border', 'solid 3px blue')
+
+              }
+              else{   // cevap olarak sectigi secenegi daha sonradan degistirmek ister ise
+
+                 if(lastSelectedOption != selectedOption ){
+
+                     $(`*[data-questionID="${questionId}"]`).find("#"+lastSelectedOption).css('border', '0') ;
+                     $(`*[data-questionID="${questionId}"]`).find("#"+selectedOption).css('border', 'solid 3px blue')
+
+                     answeredQuestions[questionId] = selectedOption
+                 }
+              }
+    });
+
+
+</script>
+
+
+}
