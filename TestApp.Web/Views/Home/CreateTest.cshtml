@@ -60,10 +60,10 @@
             <div class="form-group col-md-2 offset-5">
                 <select name="Questions[@i].CorrectOption" class="form-control">
                     <option selected value=@null>Choose answer</option>
-                    <option value="A">A</option>
-                    <option value="B">B</option>
-                    <option value="C">C</option>
-                    <option value="D">D</option>
+                    <option value="OptionA">A</option>
+                    <option value="OptionB">B</option>
+                    <option value="OptionC">C</option>
+                    <option value="OptionD">D</option>
                 </select>
                 <span class="alert-danger"> @Html.ValidationMessageFor(m => m.Questions[i].CorrectOption)</span>
 

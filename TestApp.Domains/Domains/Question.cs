@@ -7,7 +7,7 @@ namespace TestApp.Domains.Domains
 
         public string Inquiry { get; set; }
 
-        public string CorrectOption { get; set; }
+        public int CorrectOption { get; set; }
 
         public string OptionA { get; set; }
 

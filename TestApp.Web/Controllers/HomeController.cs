@@ -192,14 +192,18 @@ namespace TestApp.Web.Controllers
                 //create and insert test questions
                 var questionEntities = new List<Question>();
 
+
+
                 foreach (var questionModel in testViewModel.Questions)
                 {
+
+
                     var question = new Question()
                     {
                         TestId = test.Id,
                         CreatedDate = DateTime.UtcNow,
                         Inquiry = questionModel.Inquiry,
-                        CorrectOption = questionModel.CorrectOption,
+                        CorrectOption = (int)Enum.Parse(typeof(OptionsOfQuestion), questionModel.CorrectOption),
                         OptionA = questionModel.OptionA,
                         OptionB = questionModel.OptionB,
                         OptionC = questionModel.OptionC,
@@ -220,7 +224,7 @@ namespace TestApp.Web.Controllers
         }
 
 
-        //[Authorize]
+        [Authorize]
         [HttpGet("Tests")]
         public IActionResult ExistingTests()
         {
@@ -249,7 +253,7 @@ namespace TestApp.Web.Controllers
         }
 
 
-        //[Authorize]
+        [Authorize]
         [HttpGet("StartTest")]
         public IActionResult StartTest(int testId)
         {
@@ -268,6 +272,85 @@ namespace TestApp.Web.Controllers
 
 
             return View(testViewModel);
+        }
+
+
+        [Authorize]
+        [HttpGet("DeleteTest")]
+        public IActionResult DeleteTest(int testId)
+        {
+            var testViewModel = new TestViewModel();
+
+            #region BLL_Katmani
+            {
+                var willDelete = _testRepository.QueryWithInclude(test => test.Id == testId, null, "Questions").FirstOrDefault();
+
+                _testRepository.Delete(willDelete);
+
+
+            }
+            #endregion
+
+
+            return RedirectToAction("ExistingTests");
+        }
+
+
+
+        [Authorize]
+        [HttpPost("TestResult")]
+        public IActionResult TestResult(Dictionary<int, string> selectedAnswers, int testId)
+        {
+
+            var response = new List<TestResultViewModel>();
+
+            #region BLL_Katmani
+            {
+
+                var questions = _questionRepository.Query(q => q.TestId == testId).ToList();
+
+                foreach (var questionWithAnswer in selectedAnswers)
+                {
+                    var question = questions.Where(w => w.Id == questionWithAnswer.Key).FirstOrDefault();
+
+                    // secilen cevabın int karsılıgını buluyorum...
+                    var selectedOptionId = (int)Enum.Parse(typeof(OptionsOfQuestion), questionWithAnswer.Value);
+
+
+                    if (selectedOptionId == question.CorrectOption)
+                    {
+                        var lisItem = new TestResultViewModel
+                        {
+                            QuestionId = question.Id,
+                            IsCorrect = true,
+                            CorrectOption = ((OptionsOfQuestion)question.CorrectOption).ToString()
+                        };
+
+                        response.Add(lisItem);
+                    }
+                    else
+                    {
+
+                        var lisItem = new TestResultViewModel
+                        {
+                            QuestionId = question.Id,
+                            IsCorrect = false,
+                            CorrectOption = ((OptionsOfQuestion)question.CorrectOption).ToString()
+                        };
+
+                        response.Add(lisItem);
+
+                    }
+
+
+                }
+
+
+            }
+            #endregion
+
+
+            return Json(response);
         }
 
         private TestViewModel PrepareTestViewModel(Test testEntity)
@@ -298,10 +381,10 @@ namespace TestApp.Web.Controllers
 
                 var testQuestion = new QuestionTestViewModel()
                 {
-                    Id= question.Id,
-                    CorrectOption = question.CorrectOption,
+                    Id = question.Id,
+                    CorrectOption = ((OptionsOfQuestion)question.CorrectOption).ToString(),
                     Inquiry = question.Inquiry,
-                    OptionA = $"A) {question.OptionA}" ,
+                    OptionA = $"A) {question.OptionA}",
                     OptionB = $"B) {question.OptionB}",
                     OptionC = $"C) {question.OptionC}",
                     OptionD = $"D) {question.OptionD}",
